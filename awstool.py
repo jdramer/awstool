@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     # Set up config
     config = AWSConfig.AWSConfig()
-    config.init_from_ini("aws.ini", "us-west-2")
+    config.init_from_ini("jramer.ini", "us-west-2")
 
-
+    mp = AWSMediaPackage.AWSMediaPackage(config)
+    mp.describe_mp_channel("mpc-jeremy-001")
