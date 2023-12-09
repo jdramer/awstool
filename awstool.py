@@ -20,6 +20,11 @@ def create_pipeline(config, id_segment):
         return
     pipeline.load_mpc_create_response(mpc_resp)
     # Create MediaPackage Endpoint
+    mpoe_resp = mp.create_mp_endpoint(id_segment)
+    if not mpoe_resp:
+        pipeline.show_pipeline_objects()
+        return
+    pipeline.load_mpoe_create_response(mpoe_resp)
 
     # Create Cloudfront object
 
@@ -43,9 +48,10 @@ def delete_pipeline(config, mpc_id, mpoe_id, cf_id, mli_id, mlc_id):
     # Delete MediaLive Input
 
     # Delete MediaPackage Endpoint
-
-    # Delete MediaPackage Channel
     mp = AWSMediaPackage.AWSMediaPackage(config)
+    if mpoe_id and mpoe_id != "None":
+        mp.delete_mp_endpoint(mpoe_id)
+    # Delete MediaPackage Channel
     if mpc_id and mpc_id != "None":
         mp.delete_mp_channel(mpc_id)
 
