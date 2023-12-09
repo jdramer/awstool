@@ -3,6 +3,7 @@
 """awsms.py: Tool for automating AWS pipeline creation"""
 import argparse
 
+import AWSCloudFront
 import AWSConfig
 import AWSMediaPackage
 import Pipeline
@@ -73,6 +74,9 @@ if __name__ == "__main__":
     # Set up config
     config = AWSConfig.AWSConfig()
     config.init_from_ini("jramer.ini", "us-west-2")
+
+    cf = AWSCloudFront.AWSCloudFront(config)
+    cf.describe_cf_distribution("EMPS8L6U68VSZ")
 
     if args.create:
         create_pipeline(config, args.create)
