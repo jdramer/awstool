@@ -28,6 +28,12 @@ def create_pipeline(config, id_segment):
     pipeline.load_mpoe_create_response(mpoe_resp)
 
     # Create Cloudfront object
+    cf = AWSCloudFront.AWSCloudFront(config)
+    cf_resp = cf.create_cf_distribution(pipeline.mpoe_url, id_segment)
+    if not cf_resp:
+        pipeline.show_pipeline_objects()
+        return
+    pipeline.load_cf_create_response(cf_resp)
 
     # Create MediaLive Input
 
@@ -74,9 +80,6 @@ if __name__ == "__main__":
     # Set up config
     config = AWSConfig.AWSConfig()
     config.init_from_ini("jramer.ini", "us-west-2")
-
-    cf = AWSCloudFront.AWSCloudFront(config)
-    cf.describe_cf_distribution("EMPS8L6U68VSZ")
 
     if args.create:
         create_pipeline(config, args.create)
