@@ -56,3 +56,57 @@ class AWSCloudFront(object):
         if response:
             print("CF Distribution create %s" % response['Distribution']['Id'])
         return response
+
+    def get_cf_distribution_config(self, cf_id):
+        response = self.client.get_distribution_config(Id=cf_id)
+        response = Utils.check_response(response)
+        return response
+
+    def update_cf_distribution(self, cf_id, dist_config, etag):
+        response = self.client.update_distribution(Id=cf_id, DistributionConfig=dist_config, IfMatch=etag)
+        response = Utils.check_response(response)
+        return response
+
+    def get_cf_status(self, cf_id):
+        response = self.client.get_distribution(Id=cf_id)
+        response = Utils.check_response(response)
+        if response:
+            return response['Distribution']['Status']
+        return None
+
+    def _send_delete(self, cf_id, etag):
+        response = self.client.delete_distribution(Id=cf_id, IfMatch=etag)
+        response = Utils.check_response(response)
+        return response
+
+    def delete_cf_distribution(self, cf_id):
+        """
+        Delete Cloudfront Distribution
+        :param cf_id:
+        :return:    None on error
+                    "Disabling" when disable is processing
+                    "Deleted" when delete success
+        """
+        # Step 1 get distribution enable state
+        response = self.get_cf_distribution_config(cf_id)
+        if not response:
+            return None
+        dist_config = response['DistributionConfig']
+        etag = response['ETag']
+        # Step 2 if enabled, disable
+        if dist_config['Enabled']:
+            dist_config['Enabled'] = False
+            response = self.update_cf_distribution(cf_id, dist_config, etag)
+            if not response:
+                return None
+        # Step 3 get distribution status
+        response = self.get_cf_status(cf_id)
+        if response is None:
+            return None
+        if response != "Deployed":
+            return "Disabling"
+        # Step 4 if deployed, delete
+        response = self._send_delete(cf_id, etag)
+        if response is None:
+            return None
+        return "Deleted"

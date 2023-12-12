@@ -63,6 +63,10 @@ def delete_pipeline(config, mpc_id, mpoe_id, cf_id, mli_id, mlc_id):
         mp.delete_mp_channel(mpc_id)
 
     # Delete Cloudfront
+    cf = AWSCloudFront.AWSCloudFront(config)
+    if cf_id and cf_id != "None":
+        Utils.poll_state(cf.delete_cf_distribution, cf_id, 40, 30,
+                         "Deleted", "CF Delete")
 
 
 if __name__ == "__main__":
