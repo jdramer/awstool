@@ -6,6 +6,7 @@ import argparse
 import AWSCloudFront
 import AWSConfig
 import AWSMediaPackage
+import AWSMediaLive
 import Pipeline
 import Utils
 
@@ -36,6 +37,12 @@ def create_pipeline(config, id_segment):
     pipeline.load_cf_create_response(cf_resp)
 
     # Create MediaLive Input
+    ml = AWSMediaLive.AWSMediaLive(config)
+    mli_resp = ml.create_ml_input(id_segment)
+    if not mli_resp:
+        pipeline.show_pipeline_objects()
+        return
+    pipeline.load_mli_create_response(mli_resp)
 
     # Create MediaLive Channel
 
@@ -53,6 +60,9 @@ def delete_pipeline(config, mpc_id, mpoe_id, cf_id, mli_id, mlc_id):
     # Stop MediaLive Channel and delete
 
     # Delete MediaLive Input
+    ml = AWSMediaLive.AWSMediaLive(config)
+    if mli_id and mli_id != "None":
+        ml.delete_ml_input(mli_id)
 
     # Delete MediaPackage Endpoint
     mp = AWSMediaPackage.AWSMediaPackage(config)

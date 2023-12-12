@@ -17,6 +17,7 @@ class AWSConfig(object):
         self.aws_secret = ""
         self.aws_region = ""
         self.medialive_role = ""
+        self.input_security_group = ""
         self.session = None
 
     def init_from_ini(self, ini_filename, ini_section):
@@ -31,6 +32,7 @@ class AWSConfig(object):
         self.aws_secret = config[ini_section]["AWS_SECRET"]
         self.aws_region = config[ini_section]["AWS_REGION"]
         self.medialive_role = config[ini_section]["MEDIALIVE_ROLE"]
+        self.input_security_group = config[ini_section]["INPUT_SECURITY_GROUP"]
 
         self.session = boto3.Session(aws_access_key_id=self.aws_access,
                                      aws_secret_access_key=self.aws_secret,
