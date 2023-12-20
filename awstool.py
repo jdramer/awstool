@@ -45,6 +45,11 @@ def create_pipeline(config, id_segment):
     pipeline.load_mli_create_response(mli_resp)
 
     # Create MediaLive Channel
+    mlc_resp = ml.create_ml_channel(id_segment, pipeline.mpc_id, pipeline.mli_name, pipeline.mli_id)
+    if not mlc_resp:
+        pipeline.show_pipeline_objects()
+        return
+    pipeline.load_mlc_create_response(mlc_resp)
 
     # Start MediaLive Channel
 
@@ -58,9 +63,11 @@ def create_pipeline(config, id_segment):
 
 def delete_pipeline(config, mpc_id, mpoe_id, cf_id, mli_id, mlc_id):
     # Stop MediaLive Channel and delete
+    ml = AWSMediaLive.AWSMediaLive(config)
+    if mlc_id and mlc_id != "None":
+        ml.delete_ml_channel(mlc_id)
 
     # Delete MediaLive Input
-    ml = AWSMediaLive.AWSMediaLive(config)
     if mli_id and mli_id != "None":
         ml.delete_ml_input(mli_id)
 
