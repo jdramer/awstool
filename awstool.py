@@ -69,6 +69,12 @@ def delete_pipeline(config, mpc_id, mpoe_id, cf_id, mli_id, mlc_id):
 
     # Delete MediaLive Input
     if mli_id and mli_id != "None":
+        # It will take a few seconds for the channel to delete
+        # Confirms it is deleted once input is DETATCHED
+        result = Utils.poll_state(ml.ml_input_state, mli_id, 4, 4,
+                                  "DETACHED", "ML Input")
+        if not result:
+            return
         ml.delete_ml_input(mli_id)
 
     # Delete MediaPackage Endpoint

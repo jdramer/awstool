@@ -32,6 +32,13 @@ class AWSMediaLive(object):
             print("ML Input Deleted")
         return response
 
+    def ml_input_state(self, mli_id):
+        response = self.client.describe_input(InputId=mli_id)
+        response = Utils.check_response(response)
+        if response:
+            return response['State']
+        return None
+
     @staticmethod
     def _ml_destinations(dest_id, mpc_id):
         return [{
