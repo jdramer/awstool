@@ -394,3 +394,24 @@ class AWSMediaLive(object):
         if response:
             print("ML Channel Deleted")
         return response
+
+    def ml_channel_state(self, mlc_id):
+        response = self.client.describe_channel(ChannelId=mlc_id)
+        response = Utils.check_response(response)
+        if response:
+            return response['State']
+        return None
+
+    def ml_channel_start(self, mlc_id):
+        response = self.client.start_channel(ChannelId=mlc_id)
+        response = Utils.check_response(response)
+        if response:
+            return response['State']
+        return None
+
+    def ml_channel_stop(self, mlc_id):
+        response = self.client.stop_channel(ChannelId=mlc_id)
+        response = Utils.check_response(response)
+        if response:
+            return response['State']
+        return None

@@ -52,19 +52,47 @@ def create_pipeline(config, id_segment):
     pipeline.load_mlc_create_response(mlc_resp)
 
     # Start MediaLive Channel
+    result = Utils.poll_state(ml.ml_channel_state, pipeline.mlc_id, 12, 10,
+                              "IDLE", "MLC Create")
+    if not result:
+        pipeline.show_pipeline_objects()
+        return
+
+    result = ml.ml_channel_start(pipeline.mlc_id)
+    if not result:
+        pipeline.show_pipeline_objects()
+        return
 
     # Wait for MediaLive to enter running state
+    result = Utils.poll_state(ml.ml_channel_state, pipeline.mlc_id, 12, 10,
+                              "RUNNING", "MLC Start")
+    if not result:
+        pipeline.show_pipeline_objects()
+        return
 
     # Wait for Cloudfront to become Deployed
+    result = Utils.poll_state(cf.get_cf_status, pipeline.cf_id, 10, 60,
+                              "Deployed", "CF Deploy")
+    if not result:
+        pipeline.show_pipeline_objects()
+        return
 
-    # Dump pipeline that was created
-    pipeline.show_pipeline_objects()
+    pipeline.show_pipeline_ready()
 
 
 def delete_pipeline(config, mpc_id, mpoe_id, cf_id, mli_id, mlc_id):
     # Stop MediaLive Channel and delete
     ml = AWSMediaLive.AWSMediaLive(config)
     if mlc_id and mlc_id != "None":
+        mlc_state = ml.ml_channel_state(mlc_id)
+        if mlc_state == "RUNNING":
+            result = ml.ml_channel_stop(mlc_id)
+            if not result:
+                return
+            result = Utils.poll_state(ml.ml_channel_state, mlc_id, 12, 10,
+                                      "IDLE", "ML Stop")
+            if not result:
+                return
         ml.delete_ml_channel(mlc_id)
 
     # Delete MediaLive Input
