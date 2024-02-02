@@ -4,7 +4,7 @@ This tool demonstrates creating a video pipeline in [AWS Media Services](https:/
 
 ## Live Streaming on AWS
 
-This software is part of a [course available at Udemy](https://www.udemy.com/course/live-streaming-on-aws).
+This software is part of a [course available at Udemy](https://www.udemy.com/course/live-streaming-on-aws/?referralCode=E42ECB7641F997C4A46B).
 
 * After cloning, checkout a branch at the tag part1 and follow along
 
